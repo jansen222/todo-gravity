@@ -2,7 +2,7 @@
 const firebaseConfig = {
     apiKey: "AIzaSyDEuAQRASdsSM5wSG2NZevSVVpcutEBt_I",
     authDomain: "todo-55e6e.firebaseapp.com",
-    databaseURL: "https://todo-55e6e-default-rtdb.firebaseio.com",
+    databaseURL: "https://todo-55e6e-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "todo-55e6e",
     storageBucket: "todo-55e6e.firebasestorage.app",
     messagingSenderId: "250923692877",
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Login Logic ---
     const handleLogin = () => {
-        const keyword = keywordInput.value.trim();
+        const keyword = keywordInput.value.trim().toLowerCase();
         if (keyword === 'test') {
             sharedPath = 'boards/test'; // Shared board for "test"
             startApp();
@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = snapshot.val();
                 todos = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
                 renderTodos();
+            }, (error) => {
+                console.error("Firebase read failed:", error);
+                alert("データの読み込みに失敗しました。ルールの設定を確認してください。");
             });
         } else {
             // Local fallback (if firebase not configured)
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="delete-btn" aria-label="削除">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 0 0 1 2 2v2"></path>
                     <line x1="10" y1="11" x2="10" y2="17"></line>
                     <line x1="14" y1="11" x2="14" y2="17"></line>
                 </svg>
@@ -111,7 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
         checkbox.addEventListener('change', () => {
             const isCompleted = checkbox.checked;
             if (database) {
-                database.ref(`${sharedPath}/${todo.id}`).update({ completed: isCompleted });
+                database.ref(`${sharedPath}/${todo.id}`).update({ completed: isCompleted }).catch(err => {
+                    alert("更新に失敗しました: " + err.message);
+                });
             } else {
                 todo.completed = isCompleted;
                 li.classList.toggle('completed', isCompleted);
@@ -126,7 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
             li.style.opacity = '0';
             setTimeout(() => {
                 if (database) {
-                    database.ref(`${sharedPath}/${todo.id}`).remove();
+                    database.ref(`${sharedPath}/${todo.id}`).remove().catch(err => {
+                        alert("削除に失敗しました: " + err.message);
+                    });
                 } else {
                     todos = todos.filter(t => t.id !== todo.id);
                     saveTodos();
@@ -144,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentFilter === 'active') return !todo.completed;
             if (currentFilter === 'completed') return todo.completed;
             return true;
-        });
+        }).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
         filteredTodos.forEach(todo => {
             todoList.appendChild(createTodoElement(todo));
@@ -163,7 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             if (database) {
-                database.ref(sharedPath).push(todoData);
+                database.ref(sharedPath).push(todoData).catch(err => {
+                    alert("追加に失敗しました: " + err.message);
+                });
             } else {
                 const newTodo = { id: Date.now(), ...todoData };
                 todos.push(newTodo);
