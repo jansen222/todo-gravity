@@ -1,13 +1,13 @@
 // --- Firebase Configuration ---
-// ここに Firebase Console で取得した設定を貼り付けてください
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DATABASE_URL",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDEuAQRASdsSM5wSG2NZevSVVpcutEBt_I",
+    authDomain: "todo-55e6e.firebaseapp.com",
+    databaseURL: "https://todo-55e6e-default-rtdb.firebaseio.com",
+    projectId: "todo-55e6e",
+    storageBucket: "todo-55e6e.firebasestorage.app",
+    messagingSenderId: "250923692877",
+    appId: "1:250923692877:web:b18caf41e25f4f27267d04",
+    measurementId: "G-ZL6TCYEWLW"
 };
 
 // Initialize Firebase (if config is provided)
