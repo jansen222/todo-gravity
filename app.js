@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Login Logic ---
     const handleLogin = () => {
         const keyword = keywordInput.value.trim();
-        if (keyword === 'テスト') {
+        if (keyword === 'test') {
             sharedPath = 'boards/test'; // Shared board for "test"
             startApp();
         } else if (keyword === '') {
