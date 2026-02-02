@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity ToDo - シンプルかつ洗練されたタスク管理</title>
+    <meta name="description" content="直感的な操作と美しいデザインで、あなたの生産性を高めるToDoアプリケーション。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="app-container">
+        <header>
+            <h1 class="logo">Gravity <span>ToDo</span></h1>
+            <p class="subtitle">Focus on what matters.</p>
+        </header>
+
+        <section class="input-section glass">
+            <form id="todo-form">
+                <input type="text" id="todo-input" placeholder="新しいタスクを入力..." autocomplete="off" required>
+                <button type="submit" id="add-btn" aria-label="タスクを追加">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+        </section>
+
+        <section class="filter-section">
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="active">未完了</button>
+                <button class="filter-btn" data-filter="completed">完了済み</button>
+            </div>
+            <div class="stats">
+                <span id="items-left">0 items left</span>
+            </div>
+        </section>
+
+        <section class="list-section">
+            <ul id="todo-list" class="todo-list">
+                <!-- Tasks will be injected here -->
+            </ul>
+        </section>
+
+        <footer class="app-footer">
+            <button id="clear-completed" class="clear-btn">完了済みを削除</button>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
