@@ -1,4 +1,29 @@
+// --- Firebase Configuration ---
+// ここに Firebase Console で取得した設定を貼り付けてください
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase (if config is provided)
+let database;
+if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    const loginScreen = document.getElementById('login-screen');
+    const appContainer = document.querySelector('.app-container');
+    const keywordInput = document.getElementById('keyword-input');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+
     const todoForm = document.getElementById('todo-form');
     const todoInput = document.getElementById('todo-input');
     const todoList = document.getElementById('todo-list');
@@ -6,11 +31,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsLeft = document.getElementById('items-left');
     const clearCompletedBtn = document.getElementById('clear-completed');
 
-    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+    let todos = [];
     let currentFilter = 'all';
+    let sharedPath = ''; // Firebase path based on keyword
 
+    // --- Login Logic ---
+    const handleLogin = () => {
+        const keyword = keywordInput.value.trim();
+        if (keyword === 'テスト') {
+            sharedPath = 'boards/test'; // Shared board for "test"
+            startApp();
+        } else if (keyword === '') {
+            loginError.textContent = '合言葉を入力してください';
+        } else {
+            loginError.textContent = '合言葉が違います';
+        }
+    };
+
+    loginBtn.addEventListener('click', handleLogin);
+    keywordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    const startApp = () => {
+        loginScreen.classList.add('hidden');
+        appContainer.classList.remove('hidden');
+
+        if (database) {
+            // Firebase Mode
+            database.ref(sharedPath).on('value', (snapshot) => {
+                const data = snapshot.val();
+                todos = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+                renderTodos();
+            });
+        } else {
+            // Local fallback (if firebase not configured)
+            console.warn("Firebase not configured. Using LocalStorage fallback.");
+            todos = JSON.parse(localStorage.getItem(`todos_${sharedPath}`)) || [];
+            renderTodos();
+        }
+    };
+
+    // --- Core Logic ---
     const saveTodos = () => {
-        localStorage.setItem('todos', JSON.stringify(todos));
+        if (database) {
+            // Firebase Save: This is handled by direct actions (set/remove)
+        } else {
+            localStorage.setItem(`todos_${sharedPath}`, JSON.stringify(todos));
+        }
     };
 
     const updateStats = () => {
@@ -41,11 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const checkbox = li.querySelector('input');
         checkbox.addEventListener('change', () => {
-            todo.completed = checkbox.checked;
-            li.classList.toggle('completed', todo.completed);
-            saveTodos();
-            updateStats();
-            if (currentFilter !== 'all') renderTodos();
+            const isCompleted = checkbox.checked;
+            if (database) {
+                database.ref(`${sharedPath}/${todo.id}`).update({ completed: isCompleted });
+            } else {
+                todo.completed = isCompleted;
+                li.classList.toggle('completed', isCompleted);
+                saveTodos();
+                updateStats();
+            }
         });
 
         const deleteBtn = li.querySelector('.delete-btn');
@@ -53,9 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
             li.style.transform = 'translateX(20px)';
             li.style.opacity = '0';
             setTimeout(() => {
-                todos = todos.filter(t => t.id !== todo.id);
-                saveTodos();
-                renderTodos();
+                if (database) {
+                    database.ref(`${sharedPath}/${todo.id}`).remove();
+                } else {
+                    todos = todos.filter(t => t.id !== todo.id);
+                    saveTodos();
+                    renderTodos();
+                }
             }, 200);
         });
 
@@ -80,15 +156,21 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const text = todoInput.value.trim();
         if (text) {
-            const newTodo = {
-                id: Date.now(),
+            const todoData = {
                 text,
-                completed: false
+                completed: false,
+                timestamp: Date.now()
             };
-            todos.push(newTodo);
+
+            if (database) {
+                database.ref(sharedPath).push(todoData);
+            } else {
+                const newTodo = { id: Date.now(), ...todoData };
+                todos.push(newTodo);
+                saveTodos();
+                renderTodos();
+            }
             todoInput.value = '';
-            saveTodos();
-            renderTodos();
         }
     });
 
@@ -102,10 +184,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     clearCompletedBtn.addEventListener('click', () => {
-        todos = todos.filter(t => !t.completed);
-        saveTodos();
-        renderTodos();
+        const completedItems = todos.filter(t => t.completed);
+        if (database) {
+            completedItems.forEach(item => {
+                database.ref(`${sharedPath}/${item.id}`).remove();
+            });
+        } else {
+            todos = todos.filter(t => !t.completed);
+            saveTodos();
+            renderTodos();
+        }
     });
-
-    renderTodos();
 });

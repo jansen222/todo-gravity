@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,38 @@
     <meta name="description" content="直感的な操作と美しいデザインで、あなたの生産性を高めるToDoアプリケーション。">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="blob-container">
         <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
+        <div class="blob blob-2 : blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
-    <main class="app-container">
+    <!-- Keyword Login Section -->
+    <div id="login-screen" class="login-overlay">
+        <div class="glass login-card">
+            <h2>Shared Board</h2>
+            <p>合言葉を入力して共有ToDoに参加</p>
+            <div class="input-group">
+                <input type="password" id="keyword-input" placeholder="合言葉を入力..." autocomplete="off">
+                <button id="login-btn">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+            <p id="login-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <main class="app-container hidden">
         <header>
             <h1 class="logo">Gravity <span>ToDo</span></h1>
             <p class="subtitle">Focus on what matters.</p>
@@ -28,7 +50,8 @@
                 <input type="text" id="todo-input" placeholder="新しいタスクを入力..." autocomplete="off" required>
                 <button type="submit" id="add-btn" aria-label="タスクを追加">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
                     </svg>
                 </button>
             </form>
@@ -56,6 +79,10 @@
         </footer>
     </main>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>
